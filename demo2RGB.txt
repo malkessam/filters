@@ -1,0 +1,271 @@
+#include <iostream>
+#include <fstream>
+#include <cstring>
+#include <cmath>
+#include "bmplib.cpp"
+using namespace std;
+unsigned char image[SIZE][SIZE];
+unsigned char image2[SIZE][SIZE][RGB];
+unsigned char image5[SIZE][SIZE][RGB];
+unsigned char newimage[SIZE][SIZE][RGB];
+unsigned char image3[SIZE][SIZE][RGB];
+void loadImage ();
+void saveImage ();
+void doSomethingForImage ();
+
+int main()
+{
+    loadImage();
+    doSomethingForImage();
+    saveImage();
+    return 0;
+}
+
+void loadImage () {
+    char imageFileName[100];
+
+    // Get gray scale image file name
+    cout << "Enter the source image file name: ";
+    cin >> imageFileName;
+
+    // Add to it .bmp extension and load image
+    strcat (imageFileName, ".bmp");
+    readGSBMP(imageFileName, image);
+}
+void saveimg() {
+    char directory[100];
+    cout << "enter what name do u want to save ur image with:";
+    cin >> directory;
+    strcat(directory, ".bmp");
+    writeRGBBMP(directory, image2);
+}
+
+void saveImage () {
+    char imageFileName[100];
+
+    // Get gray scale image target file name
+    cout << "Enter the target image file name: ";
+    cin >> imageFileName;
+
+    // Add to it .bmp extension and load image
+    strcat (imageFileName, ".bmp");
+    writeGSBMP(imageFileName, image);
+}
+
+void doSomethingForImage() {
+    for (int i = 0; i < SIZE; i++) {
+        for (int j = 0; j < SIZE; j++) {
+            if (image[i][j] > 127) {
+                image[i][j] = 255;
+            }
+            else{
+                image[i][j] = 0;
+            }
+        }
+    }
+}
+void getimg(){
+    char directory[100];
+    cout<<"enter the image u want to enlarge:";
+    cin>>directory;
+    strcat(directory,".bmp");
+    readRGBBMP(directory,image2);
+    cout<<"enter the image u want to shuffle:";
+    cin>>directory;
+    strcat(directory,".bmp");
+    readRGBBMP(directory,image3);
+    readRGBBMP(directory,newimage);
+}
+
+void invert(){
+    for (int i = 0; i < SIZE; ++i)
+    {
+        for (int j = 0; j < SIZE; ++j)
+        {
+            for (int k = 0; k < RGB; k++)
+            {
+                image5[i][j][k]=255-image5[i][j][k];
+            }
+
+        }
+
+    }
+
+}
+
+void enlarge(){
+    int quarter;
+    cout<<"please enter the quarter u want to enlarge:";
+    cin>>quarter;
+    for (int k =0 ; k<RGB; k++){
+        for (int i = 0; i < SIZE; i+=2){
+            for (int j =0; j<SIZE;j+=2){
+                if (quarter==1){
+                    image2[i][j][k]=image2[i/2][j/2][k];
+                    image2[i][j+1][k]=image2[i/2][j/2][k];
+                    image2[i+1][j][k]=image2[i/2][j/2][k];
+                    image2[i+1][j+1][k]=image2[i/2][j/2][k];
+                }else if (quarter==2){
+                    image2[i][j][k]=image2[i/2][(j+SIZE)/2][k];
+                    image2[i][j+1][k]=image2[i/2][(j+SIZE)/2][k];
+                    image2[i+1][j][k]=image2[i/2][(j+SIZE)/2][k];
+                    image2[i+1][j+1][k]=image2[i/2][(j+SIZE)/2][k];
+                }else if (quarter==3){
+                    image2[i][j][k]=image2[(i+SIZE)/2][j/2][k];
+                    image2[i][j+1][k]=image2[(i+SIZE)/2][j/2][k];
+                    image2[i+1][j][k]=image2[(i+SIZE)/2][j/2][k];
+                    image2[i+1][j+1][k]=image2[(i+SIZE)/2][j/2][k];
+                }else if (quarter==4){
+                    image2[i][j][k]=image2[(i+SIZE)/2][(j+SIZE)/2][k];
+                    image2[i][j+1][k]=image2[(i+SIZE)/2][(j+SIZE)/2][k];
+                    image2[i+1][j][k]=image2[(i+SIZE)/2][(j+SIZE)/2][k];
+                    image2[i+1][j+1][k]=image2[(i+SIZE)/2][(j+SIZE)/2][k];
+                }
+            }
+        }
+    }
+
+}
+
+void shuffle() {
+    string order;
+    cout << "enter the order";
+    cin >> order;
+    int length = order.length();
+    for (int k = 0; k < RGB; k++) {
+        int index = 0;
+        while (index < 4) {
+            if (index == 0) {
+                if (order[index] == '1') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i][j][k] = newimage[i][j][k];
+                        }
+                    }
+
+                } else if (order[index] == '2') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i][j][k] = newimage[i][j + SIZE / 2][k];
+                        }
+                    }
+                } else if (order[index] == '3') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i][j][k] = newimage[i + SIZE / 2][j][k];
+                        }
+
+                    }
+                } else if (order[index] == '4') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i][j][k] = newimage[i + SIZE / 2][j + SIZE / 2][k];
+                        }
+
+                    }
+                }
+            }
+                // --------------------
+            else if (index == 1) {
+                if (order[index] == '1') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i][j + SIZE / 2][k] = newimage[i][j][k];
+                        }
+
+                    }
+
+                } else if (order[index] == '2') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i][j + SIZE / 2][k] = newimage[i][j + SIZE / 2][k];
+                        }
+
+                    }
+                } else if (order[index] == '3') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i][j + SIZE / 2][k] = newimage[i + SIZE / 2][j][k];
+                        }
+
+                    }
+                } else if (order[index] == '4') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i][j + SIZE / 2][k] = newimage[i + SIZE / 2][j + SIZE / 2][k];
+                        }
+
+                    }
+                }
+            }
+                // -------------
+            else if (index == 2) {
+                if (order[index] == '1') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i + SIZE / 2][j][k] = newimage[i][j][k];
+                        }
+
+                    }
+
+                } else if (order[index] == '2') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i + SIZE / 2][j][k] = newimage[i][j + SIZE / 2][k];
+                        }
+
+                    }
+                } else if (order[index] == '3') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i + SIZE / 2][j][k] = newimage[i + SIZE / 2][j][k];
+                        }
+
+                    }
+                } else if (order[index] == '4') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i + SIZE / 2][j][k] = newimage[i + SIZE / 2][j + SIZE / 2][k];
+                        }
+
+                    }
+                }
+            }// ---------
+            else if (index == 3) {
+                if (order[index] == '1') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i + SIZE / 2][j + SIZE / 2][k] = newimage[i][j][k];
+                        }
+
+                    }
+                } else if (order[index] == '2') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i + SIZE / 2][j + SIZE / 2][k] = newimage[i][j + SIZE / 2][k];
+                        }
+
+                    }
+                } else if (order[index] == '3') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i + SIZE / 2][j + SIZE / 2][k] = newimage[i + SIZE / 2][j][k];
+                        }
+
+                    }
+                } else if (order[index] == '4') {
+                    for (int i = 0; i < SIZE / 2; i++) {
+                        for (int j = 0; j < SIZE / 2; j++) {
+                            image3[i + SIZE / 2][j + SIZE / 2][k] = newimage[i + SIZE / 2][j + SIZE / 2][k];
+                        }
+
+                    }
+                }
+            }
+            index++;
+        }
+    }
+
+
+
+}
